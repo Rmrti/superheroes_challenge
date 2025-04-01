@@ -53,6 +53,19 @@ def get_powers():
     powers = Power.query.all()
     return jsonify([{'id': power.id, 'name': power.name, 'description': power.description} for power in powers])
 
+#create power
+
+
+@app.route('/powers', methods=['POST'])
+def create_power():
+    data = request.get_json()
+    if 'name' not in data or 'description' not in data:
+        return jsonify({"error": "Missing required fields"}), 400
+    new_power = Power(name=data['name'], description=data['description'])
+    db.session.add(new_power)
+    db.session.commit()
+    return jsonify({"id": new_power.id, "name": new_power.name, "description": new_power.description}), 201
+
 # GET /powers/:id
 @app.route('/powers/<int:power_id>', methods=['GET'])
 def get_power(power_id):
