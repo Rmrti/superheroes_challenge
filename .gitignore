@@ -1,0 +1,54 @@
+# Byte-compiled and cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+env/
+*.env
+*.venv
+pip-log.txt
+pip-delete-this-directory.txt
+
+# IDE/editor specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs and database files
+*.log
+*.sqlite3
+instance/
+migrations/versions/
+
+# Flask cache and session data
+*.pid
+*.session
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+.envrc
+
+# Alembic migration cache
+migrations/__pycache__/
+
+# Python egg files
+*.egg-info/
+dist/
+build/
+
+# Pytest and test-related files
+.coverage
+.tox/
+nosetests.xml
