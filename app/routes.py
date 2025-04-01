@@ -1,7 +1,8 @@
 from flask import Flask, request, jsonify
 from app.models import db, Hero, Power, HeroPower
 
-app = Flask(__name__)
+from app import create_app
+app = create_app()
 
 #GET HEROES
 
