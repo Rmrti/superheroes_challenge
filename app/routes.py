@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from models import db, Hero, Power, HeroPower
+from app.models import db, Hero, Power, HeroPower
 
 app = Flask(__name__)
 
