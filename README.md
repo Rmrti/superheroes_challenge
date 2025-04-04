@@ -1,7 +1,13 @@
 # 🚀 Superheroes Challenge
 
 ## 📌 Project Overview
-Superheroes Challenge is a Flask-based web application that allows users to explore and manage a collection of superheroes. It uses **Flask**, **SQLAlchemy**, **Alembic**, and **SQLite** for backend functionality.
+Superheroes Challenge is a Flask-based web application that allows users to explore and manage a collection of superheroes and their powers. It follows a **many-to-many relationship**, where:  
+
+- A **Hero** has many **Powers** through **HeroPower**  
+- A **Power** has many **Heroes** through **HeroPower**  
+- A **HeroPower** belongs to both a **Hero** and a **Power**  
+
+The application is built using **Flask**, **SQLAlchemy**, **Alembic**, and **SQLite**.
 
 ---
 
@@ -18,7 +24,7 @@ Superheroes Challenge is a Flask-based web application that allows users to expl
 ---
 
 ## 🎯 Features  
-✅ Create, Read, Update, and Delete (CRUD) superheroes  
+✅ CRUD operations for **Heroes, Powers, and HeroPowers**  
 ✅ SQLite database integration with Flask-SQLAlchemy  
 ✅ Alembic for database migrations  
 ✅ RESTful API with Flask  
@@ -84,13 +90,39 @@ flask db upgrade
 
 ## 🌐 API Endpoints  
 
+### 🦸‍♂️ Hero Endpoints  
+
 | Method | Endpoint | Description |
 |--------|---------|-------------|
 | **GET** | `/heroes` | Get all superheroes |
 | **GET** | `/heroes/<id>` | Get a specific superhero by ID |
 | **POST** | `/heroes` | Add a new superhero |
 | **PUT** | `/heroes/<id>` | Update superhero details |
-| **DELETE** | `/heroes/<id>` | Delete a superhero |
+
+
+---
+
+### ⚡ Power Endpoints  
+
+| Method | Endpoint | Description |
+|--------|---------|-------------|
+| **GET** | `/powers` | Get all powers |
+| **GET** | `/powers/<id>` | Get a specific power by ID |
+| **POST** | `/powers` | Add a new power |
+| **PUT** | `/powers/<id>` | Update power details |
+
+
+---
+
+### 🔗 HeroPower Endpoints  
+
+| Method | Endpoint | Description |
+|--------|---------|-------------|
+| **GET** | `/hero_powers` | Get all hero-power relationships |
+| **GET** | `/hero_powers/<id>` | Get a specific hero-power relationship |
+| **POST** | `/hero_powers` | Assign a power to a hero |
+| **PUT** | `/hero_powers/<id>` | Update hero-power relationship |
+
 
 ---
 
@@ -109,4 +141,4 @@ This project is licensed under the **MIT License**.
 
 ---
 
-🚀 Happy Coding! 🦸‍♂️🦸‍♀️
+🚀 Happy Coding! 🦸‍♂️🦸‍♀️⚡
