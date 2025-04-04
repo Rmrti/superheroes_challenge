@@ -1,95 +1,74 @@
 import logging
 from logging.config import fileConfig
 
-from flask import current_app
+from flask import Flask, current_app
 from alembic import context
 
-# Import the db and models
-from app import create_app
-from app.models import db
+from app import create_app, db  # Ensure this is correctly importing your app and database
 
-# This is the Alembic Config object, which provides
-# access to the values within the .ini file in use.
+# Alembic configuration
 config = context.config
 
-# Interpret the config file for Python logging.
-# This line sets up loggers basically.
-fileConfig(config.config_file_name)
-logger = logging.getLogger('alembic.env')
-
+# Configure logging
+if config.config_file_name:
+    fileConfig(config.config_file_name)
+logger = logging.getLogger("alembic.env")
 
 def get_engine():
+    """Retrieve the SQLAlchemy engine safely."""
     try:
-        # This works with Flask-SQLAlchemy<3 and Alchemical
-        return current_app.extensions['migrate'].db.get_engine()
+        return current_app.extensions["migrate"].db.get_engine()
     except (TypeError, AttributeError):
-        # This works with Flask-SQLAlchemy>=3
-        return current_app.extensions['migrate'].db.engine
-
+        return current_app.extensions["migrate"].db.engine
 
 def get_engine_url():
+    """Retrieve database URL safely from engine."""
     try:
-        return get_engine().url.render_as_string(hide_password=False).replace(
-            '%', '%%')
+        return get_engine().url.render_as_string(hide_password=False).replace("%", "%%")
     except AttributeError:
-        return str(get_engine().url).replace('%', '%%')
+        return str(get_engine().url).replace("%", "%%")
 
-
-# Point target_metadata to your db's metadata
-# This is necessary for Alembic to inspect your models
-target_metadata = db.metadata
-
-
-config.set_main_option('sqlalchemy.url', get_engine_url())
-
-target_db = current_app.extensions['migrate'].db
+# Set database URL dynamically
+config.set_main_option("sqlalchemy.url", get_engine_url())
 
 def get_metadata():
-    if hasattr(target_db, 'metadatas'):
-        return target_db.metadatas[None]
-    return target_db.metadata
-
+    """Retrieve metadata for migrations."""
+    target_db = current_app.extensions["migrate"].db
+    return target_db.metadatas[None] if hasattr(target_db, "metadatas") else target_db.metadata
 
 def run_migrations_offline():
-    """Run migrations in 'offline' mode."""
+    """Run migrations in offline mode."""
     url = config.get_main_option("sqlalchemy.url")
-    context.configure(
-        url=url, target_metadata=target_metadata, literal_binds=True
-    )
-
+    context.configure(url=url, target_metadata=get_metadata(), literal_binds=True)
+    
     with context.begin_transaction():
         context.run_migrations()
 
-
 def run_migrations_online():
-    """Run migrations in 'online' mode."""
-    # this callback is used to prevent an auto-migration from being generated
-    # when there are no changes to the schema
-    def process_revision_directives(context, revision, directives):
-        if getattr(config.cmd_opts, 'autogenerate', False):
-            script = directives[0]
-            if script.upgrade_ops.is_empty():
-                directives[:] = []
-                logger.info('No changes in schema detected.')
+    """Run migrations in online mode, ensuring correct app context."""
+    app = create_app()
+    
+    with app.app_context():  # Ensures context is properly handled
+        def process_revision_directives(context, revision, directives):
+            if getattr(config, "cmd_opts", None) and getattr(config.cmd_opts, "autogenerate", False):
+                script = directives[0]
+                if script.upgrade_ops.is_empty():
+                    directives[:] = []
+                    logger.info("No changes in schema detected.")
 
-    conf_args = current_app.extensions['migrate'].configure_args
-    if conf_args.get("process_revision_directives") is None:
-        conf_args["process_revision_directives"] = process_revision_directives
+        conf_args = current_app.extensions["migrate"].configure_args
+        if conf_args.get("process_revision_directives") is None:
+            conf_args["process_revision_directives"] = process_revision_directives
 
-    connectable = get_engine()
+        connectable = get_engine()
+        
+        with connectable.connect() as connection:
+            context.configure(connection=connection, target_metadata=get_metadata(), **conf_args)
 
-    with connectable.connect() as connection:
-        context.configure(
-            connection=connection,
-            target_metadata=target_metadata,
-            **conf_args
-        )
+            with context.begin_transaction():
+                context.run_migrations()
 
-        with context.begin_transaction():
-            context.run_migrations()
-
-
-# Determine whether we are running offline or online migrations
+# Determine the migration mode
 if context.is_offline_mode():
     run_migrations_offline()
 else:
